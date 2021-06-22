@@ -288,12 +288,13 @@ def search_artists():
     search_term = request.form.get('search_term', '')
     result = Artist.query.filter_by(
         Artist.name.ilike('%' + search_term + '%')).all()
+    shows = Show.query.filter(Show.venue_id == result.id).all()
     for artist in result:
         data.append(
             {
                 "id": artist.id,
                 "name": artist.name,
-                "num_upcoming_shows": 0,
+                "num_upcoming_shows": len(upcoming_shows(shows)),
             }
         )
     response = {
