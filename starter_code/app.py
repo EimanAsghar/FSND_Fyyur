@@ -470,7 +470,8 @@ def shows():
     #       num_shows should be aggregated based on number of upcoming shows per venue.
     data = []
 
-    result = db.session.query(Show).join(Artist).join(Venue).all()
+    result = db.session.query(Show).join(Venue).join(
+        Artist).all()
 
     for shows in result:
         data.append({
@@ -479,7 +480,7 @@ def shows():
             "artist_id": shows.artist_id,
             "artist_name": shows.artist.name,
             "artist_image_link": shows.artist.image_link,
-            "start_time": shows.start_time
+            "start_time": str(shows.start_time)
         })
 
     return render_template('pages/shows.html', shows=data)
@@ -499,23 +500,22 @@ def create_show_submission():
     form = ShowForm(request.form)
 
     try:
-            show = Show(
-                artist_id=form.artist_id.data,
-                venue_id=form.venue_id.data,
-                start_time=form.start_time.data
-            )
+        show = Show(
+            artist_id=form.artist_id.data,
+            venue_id=form.venue_id.data,
+            start_time=form.start_time.data
+        )
 
-            db.session.add(show)
-            db.session.commit()
-            flash('Success!')
+        db.session.add(show)
+        db.session.commit()
+        flash('Success!')
 
     except:
-            db.session.rollback()
-            flash('Fail, Try Again')
+        db.session.rollback()
+        flash('Fail, Try Again')
 
     finally:
-            db.session.close()
-
+        db.session.close()
 
     return render_template('pages/home.html')
 
