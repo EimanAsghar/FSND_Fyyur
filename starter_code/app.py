@@ -3,7 +3,6 @@
 #----------------------------------------------------------------------------#
 
 
-from models import *
 import json
 import dateutil.parser
 import babel
@@ -35,6 +34,7 @@ app.config.from_object('config')
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
+from models import *
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -500,26 +500,31 @@ def create_shows():
 def create_show_submission():
     # called to create new shows in the db, upon submitting new show listing form
     # TODO: insert form data as a new Show record in the db, instead
-
     form = ShowForm(request.form)
-    try:
-        show = Show(
-            venue_id=form.venue_id.data,
-            artist_id=form.artist_id.data,
-            start_time=form.start_time.data
-        )
 
-        db.session.add(show)
-        db.session.commit()
-        flash('Show was successfully listed!')
+    # Resource: https://wtforms.readthedocs.io/en/2.3.x/forms/
+    if form.validate():
+        try:
+            show = Show(
+                artist_id=form.artist_id.data,
+                venue_id=form.venue_id.data,
+                start_time=form.start_time.data
+            )
 
-    except:
-        db.session.rollback()
-        flash('An error occurred. Show could not be listed.')
-        print(sys.exc_info())
+            db.session.add(show)
+            db.session.commit()
+            flash('Success!')
 
-    finally:
-        db.session.close()
+        except:
+            db.session.rollback()
+            print(sys.exc_info())
+
+            flash('Fail !')
+        finally:
+            db.session.close()
+    else:
+        print(form.errors)
+        flash('Not Valid !!')
 
     return render_template('pages/home.html')
 
