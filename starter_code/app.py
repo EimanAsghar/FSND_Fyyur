@@ -56,10 +56,11 @@ def upcoming_shows(shows):
 
     for show in shows:
         if show.start_time > datetime.now():
+
             upcoming_shows.append({
                 "artist_id": show.artist_id,
-                "artist_name": Artist.query.filter_by(id=show.artist_id).one().name,
-                "artist_image_link": Artist.query.filter_by(id=show.artist_id).one().image_link,
+                "artist_name": Artist.query.filter_by(id=show.artist_id).first().name,
+                "artist_image_link": Artist.query.filter_by(id=show.artist_id).first().image_link,
                 "start_time": format_datetime(str(show.start_time))
             })
 
@@ -72,6 +73,7 @@ def past_shows(shows):
 
     for show in shows:
         if show.start_time < datetime.now():
+
             past_shows.append({
                 "artist_id": show.artist_id,
                 "artist_name": Artist.query.filter_by(id=show.artist_id).first().name,
@@ -106,7 +108,7 @@ def venues():
     for city in result:
         venues = Venue.query.filter(Venue.city == city.city).filter(
             Venue.state == city.state).all()
-        shows = Show.query.filter_by(Show.venue_id == venues.id).all()
+        shows = Show.query.filter(Show.venue_id == venues.id).all()
 
         for venue in venues:
             venue_data.append({
@@ -155,7 +157,7 @@ def search_venues():
     search_term = request.form.get('search_term', '')
     result = Venue.query.filter(
         Venue.name.ilike("%{}%".format(search_term))).all()
-    shows = Show.query.filter_by(Show.venue_id == result.id).all()
+    shows = Show.query.filter(Show.venue_id == result.id).all()
     for venue in result:
         data.append(
             {
@@ -177,7 +179,7 @@ def show_venue(venue_id):
     # TODO: replace with real venue data from the venues table, using venue_id
   data= []
   venues = Venue.query.get(venue_id)
-  shows = Show.query.filter_by(Show.venue_id == venues.id).all()
+  shows = Show.query.filter(Show.venue_id == venues.id).all()
   past_shows = past_shows(shows)
   upcoming_shows = upcoming_shows(shows)
 
@@ -381,7 +383,7 @@ def search_artists():
     # search for "band" should return "The Wild Sax Band".
     data = []
     search_term = request.form.get('search_term', '')
-    result = Artist.query.filter(
+    result = Artist.query.filter_by(
         Artist.name.ilike("%{}%".format(search_term))).all()
     for artist in result:
         data.append(
@@ -404,7 +406,7 @@ def show_artist(artist_id):
     # TODO: replace with real artist data from the artist table, using artist_id
   data= []
   artists = Venue.query.get(artist_id)
-  shows = Show.query.filter_by(Show.artist_id == artists.id).all()
+  shows = Show.query.filter(Show.artist_id == artists.id).all()
   past_shows = past_shows(shows)
   upcoming_shows = upcoming_shows(shows)
 
