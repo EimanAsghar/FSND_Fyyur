@@ -17,7 +17,9 @@ from flask import (
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 import logging
-from logging import Formatter, FileHandler, error
+from logging import (
+    Formatter, FileHandler, error
+)
 from flask_wtf import Form
 from flask_migrate import Migrate
 from forms import *
@@ -426,7 +428,7 @@ def create_artist_submission():
     # called upon submitting the new artist listing form
     # TODO: insert form data as a new Venue record in the db, instead
     # TODO: modify data to be the data object returned from db insertion
-    form = VenueForm(request.form)
+    form = ArtistForm(request.form)
     try:
         artist = Artist(name=form.name.data,
                         city=form.city.data,
@@ -436,7 +438,7 @@ def create_artist_submission():
                         image_link=form.image_link.data,
                         facebook_link=form.facebook_link.data,
                         website_link=form.website_link.data,
-                        seeking_venue=form.seeking_talent.data,
+                        seeking_venue=form.seeking_venue.data,
                         seeking_description=form.seeking_description.data
                         )
         db.session.add(artist)
@@ -468,23 +470,17 @@ def shows():
     #       num_shows should be aggregated based on number of upcoming shows per venue.
     data = []
 
-    result = Show.query.join(
-        Venue, (Venue.id == Show.venue_id)
-    ).join(
-        Artist, (Artist.id == Show.artist_id)
-    ).all()
+    result = db.session.query(Show).join(Artist).join(Venue).all()
 
     for shows in result:
-        data.append(
-            {
-                "venue_id": shows.venue_id,
-                "venue_name": shows.venue.name,
-                "artist_id": shows.artist_id,
-                "artist_name": shows.artist.name,
-                "artist_image_link": shows.artist.image_link,
-                "start_time": shows.start_time
-            }
-        )
+        data.append({
+            "venue_id": shows.venue_id,
+            "venue_name": shows.venue.name,
+            "artist_id": shows.artist_id,
+            "artist_name": shows.artist.name,
+            "artist_image_link": shows.artist.image_link,
+            "start_time": shows.start_time
+        })
 
     return render_template('pages/shows.html', shows=data)
 
@@ -502,9 +498,7 @@ def create_show_submission():
     # TODO: insert form data as a new Show record in the db, instead
     form = ShowForm(request.form)
 
-    # Resource: https://wtforms.readthedocs.io/en/2.3.x/forms/
-    if form.validate():
-        try:
+    try:
             show = Show(
                 artist_id=form.artist_id.data,
                 venue_id=form.venue_id.data,
@@ -515,16 +509,13 @@ def create_show_submission():
             db.session.commit()
             flash('Success!')
 
-        except:
+    except:
             db.session.rollback()
-            print(sys.exc_info())
+            flash('Fail, Try Again')
 
-            flash('Fail !')
-        finally:
+    finally:
             db.session.close()
-    else:
-        print(form.errors)
-        flash('Not Valid !!')
+
 
     return render_template('pages/home.html')
 
