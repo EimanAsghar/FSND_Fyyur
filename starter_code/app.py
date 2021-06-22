@@ -155,7 +155,7 @@ def search_venues():
     # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
     data = []
     search_term = request.form.get('search_term', '')
-    result = Venue.query.filter(
+    result = Venue.query.filter_by(
         Venue.name.ilike("%{}%".format(search_term))).all()
     shows = Show.query.filter(Show.venue_id == result.id).all()
     for venue in result:
