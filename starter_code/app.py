@@ -80,17 +80,17 @@ def upcoming_shows(shows):
 def past_shows(shows):
 
     past_shows = []
-    #currunt_time = datetime.now()
+    currunt_time = datetime.now()
 
     for show in shows:
-        # if show.start_time < currunt_time:
+        if show.start_time < currunt_time:
 
-        past_shows.append({
+         past_shows.append({
             "artist_id": show.artist_id,
             "artist_name": Artist.query.filter_by(id=show.artist_id).first().name,
             "artist_image_link": Artist.query.filter_by(id=show.artist_id).first().image_link,
             "start_time": format_datetime(str(show.start_time))
-        })
+            })
 
     return past_shows
 
