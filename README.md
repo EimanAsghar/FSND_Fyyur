@@ -84,8 +84,8 @@ Highlight folders:
 ## Development Setup
 1. **Download the project starter code locally**
 ```
-git clone https://github.com/udacity/FSND.git
-cd FSND/projects/01_fyyur/starter_code 
+git clone https://github.com/EimanAsghar/FSND_Fyyur.git
+cd FSND_Fyyur/starter_code 
 ```
 
 2. **Create an empty repository in your Github account online. To change the remote repository path in your local repository, use the commands below:**
